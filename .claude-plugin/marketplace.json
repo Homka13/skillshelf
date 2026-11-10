@@ -1,0 +1,13 @@
+{
+  "name": "skillshelf",
+  "owner": {
+    "name": "Homka13"
+  },
+  "plugins": [
+    {
+      "name": "skillshelf",
+      "source": "./plugins/skillshelf",
+      "description": "Personal agent skills collected across projects"
+    }
+  ]
+}
