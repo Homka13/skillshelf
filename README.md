@@ -38,9 +38,36 @@ gh auth setup-git
 
 Або увімкніть автооновлення: `/plugin` → Marketplaces → skillshelf → Enable auto-update.
 
+## Перевірка безпеки
+
+Кожен скіл перевіряє [Snyk Agent Scan](https://github.com/snyk/agent-scan): приховані інструкції для агента, шкідливий код, секрети, підозрілі завантаження тощо. Вміст скіла відправляється в Snyk на аналіз, секрети перед цим вирізаються.
+
+**Автоматично в GitHub.** Workflow `Snyk skill scan` запускається на кожен пуш і pull request, що змінює `plugins/`. Йому потрібен секрет репозиторію `SNYK_TOKEN` (API-токен із https://app.snyk.io/account). Додати його можна так, команда сама попросить вставити токен:
+
+```bash
+gh secret set SNYK_TOKEN --repo Homka13/skillshelf
+```
+
+**Локально, зокрема для чужого скіла перед встановленням.** Потрібен `uv` (`brew install uv`) і той самий токен у змінній `SNYK_TOKEN` або в Keychain:
+
+```bash
+security add-generic-password -a "$USER" -s snyk-token -w
+```
+
+```bash
+scripts/scan-skill.sh ./plugins/skillshelf/skills
+```
+
+```bash
+scripts/scan-skill.sh ~/Downloads/some-skill
+```
+
+Скрипт завжди вимагає шлях. Без шляху сканер перевіряв би всі налаштування агентів на комп'ютері.
+
 ## Як додати новий скіл
 
 1. Створіть папку `plugins/skillshelf/skills/<назва-скіла>/` з файлом `SKILL.md`. У шапці файлу потрібні `name` і `description`. Опис має казати, що скіл робить і коли його вмикати.
 2. Довгі довідкові матеріали кладіть у `references/` поруч із `SKILL.md` і посилайтеся на них із тексту, щоб основний файл лишався коротким.
 3. Додайте рядок у таблицю вище.
-4. Перевірте структуру, якщо під рукою є CLI: `claude plugin validate .`
+4. Перевірте структуру: `claude plugin validate .`
+5. Проскануйте скіл: `scripts/scan-skill.sh plugins/skillshelf/skills/<назва-скіла>`

@@ -1,0 +1,51 @@
+name: Snyk skill scan
+
+# Checks every skill in the plugin with Snyk Agent Scan: prompt injection,
+# malicious code, secrets, suspicious downloads and similar risks.
+# Needs a repository secret SNYK_TOKEN (Snyk API token).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "plugins/**"
+      - ".github/workflows/scan-skills.yml"
+  pull_request:
+    paths:
+      - "plugins/**"
+      - ".github/workflows/scan-skills.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: scan-skills-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Scan skills
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          # Pinned on purpose: bump after reading the release notes.
+          AGENT_SCAN_VERSION: "0.6.11"
+        run: |
+          if [ -z "$SNYK_TOKEN" ]; then
+            echo "::error::Repository secret SNYK_TOKEN is not set. Add it with: gh secret set SNYK_TOKEN --repo ${{ github.repository }}"
+            exit 1
+          fi
+          # Only the skills folder is passed, so the scanner does not look for
+          # agent configs on the runner. The docs require
+          # --dangerously-run-mcp-servers with --ci; there are no MCP configs
+          # in this path, so nothing is started.
+          uvx --python 3.13 "snyk-agent-scan@${AGENT_SCAN_VERSION}" \
+            --ci --dangerously-run-mcp-servers \
+            ./plugins/skillshelf/skills
