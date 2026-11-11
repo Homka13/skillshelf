@@ -1,6 +1,6 @@
 {
   "name": "skillshelf",
-  "description": "Personal agent skills collected across projects",
+  "description": "Claude Code skills that grow out of our everyday product work",
   "owner": {
     "name": "Homka13"
   },
@@ -8,7 +8,7 @@
     {
       "name": "skillshelf",
       "source": "./plugins/skillshelf",
-      "description": "Personal agent skills collected across projects"
+      "description": "Claude Code skills that grow out of our everyday product work"
     }
   ]
 }
