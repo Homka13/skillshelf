@@ -3,17 +3,12 @@ name: Snyk skill scan
 # Checks every skill in the plugin with Snyk Agent Scan: prompt injection,
 # malicious code, secrets, suspicious downloads and similar risks.
 # Needs a repository secret SNYK_TOKEN (Snyk API token).
+#
+# Manual only: the public Agent Scan quota for our token is exhausted on
+# every run (X007). skills.sh runs Snyk, Socket and Gen Agent Trust Hub on
+# each published skill instead. Run this by hand if the quota changes.
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "plugins/**"
-      - ".github/workflows/scan-skills.yml"
-  pull_request:
-    paths:
-      - "plugins/**"
-      - ".github/workflows/scan-skills.yml"
   workflow_dispatch:
 
 permissions:
